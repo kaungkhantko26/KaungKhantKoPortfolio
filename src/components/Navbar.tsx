@@ -5,8 +5,7 @@ import { profile } from '../data/profile';
 import ThemeToggle from './ThemeToggle';
 
 const links = [
-  ['Home', 'home'], ['About', 'about'], ['Work', 'work'], ['Skills', 'skills'],
-  ['Experience', 'experience'], ['Credentials', 'credentials'], ['Contact', 'contact'],
+  ['Home', 'home'], ['About', 'about'], ['Work', 'work'], ['Experience', 'experience'], ['Contact', 'contact'],
 ] as const;
 
 export default function Navbar() {

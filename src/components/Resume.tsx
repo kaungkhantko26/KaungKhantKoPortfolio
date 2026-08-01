@@ -1,19 +1,12 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { Award, BadgeCheck, ChevronDown, GraduationCap, Languages, Search } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { certifications, education, profile } from '../data/profile';
-const categories = ['All', 'Development', 'Cybersecurity', 'Design', 'English'] as const;
+import { ArrowUpRight, BadgeCheck } from 'lucide-react';
+import { certifications, profile } from '../data/profile';
+const featuredTitles = ['Software Engineer', 'Frontend Developer (React)', 'Ethical Hacker', 'Foundations of Cybersecurity'];
 export default function Resume() {
-  const [all, setAll] = useState(false); const [filter, setFilter] = useState('All'); const [query, setQuery] = useState(''); const [open, setOpen] = useState<string | null>(null);
-  const credentials = useMemo(() => certifications.filter(c => (all || c.featured) && (filter === 'All' || c.category === filter) && `${c.title} ${c.issuer}`.toLowerCase().includes(query.toLowerCase())), [all, filter, query]);
-  return <>
-    <section id="education" className="section"><div className="container"><div className="section-heading"><span>05 / EDUCATION</span><h2>Learning with <em>direction.</em></h2></div><div className="education-grid">{education.map((item, i) => <motion.article key={item.institution} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * .06 }}><div><GraduationCap /><span>{item.status}</span></div><small>{item.period || 'Date not listed'}</small><h3>{item.institution}</h3><p>{item.award}</p><em>{item.details[0]}</em></motion.article>)}</div></div></section>
-    <section id="credentials" className="section credentials-section"><div className="container">
-      <div className="section-heading split"><div><span>06 / CREDENTIALS</span><h2>Proof of consistent <em>learning.</em></h2></div><p>Featured certifications first. Search or expand the complete verified list when you need detail.</p></div>
-      <div className="credential-tools"><label><Search /><span className="sr-only">Search credentials</span><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search credentials or issuers" /></label><div className="filters">{categories.map(c => <button key={c} onClick={() => setFilter(c)} aria-pressed={filter === c}>{c}</button>)}</div></div>
-      <motion.div layout className="credential-grid"><AnimatePresence mode="popLayout">{credentials.map(c => <motion.article layout key={`${c.title}-${c.issuer}`} initial={{ opacity: 0, scale: .97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: .97 }}><div className="credential-icon"><BadgeCheck /></div><div className="credential-top"><span>{c.category}</span><small>{c.issued || 'Date not listed'}</small></div><h3>{c.title}</h3><p>{c.issuer}</p>{(c.credentialId || c.skills) && <><button onClick={() => setOpen(open === c.title ? null : c.title)} aria-expanded={open === c.title}>Credential details <ChevronDown /></button><AnimatePresence>{open === c.title && <motion.div className="credential-detail" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>{c.credentialId && <span>ID: {c.credentialId}</span>}{c.skills && <span>Skills: {c.skills.join(', ')}</span>}</motion.div>}</AnimatePresence></>}</motion.article>)}</AnimatePresence></motion.div>
-      {!credentials.length && <p className="empty-state">No credentials match that search.</p>}<button className="button secondary view-all" onClick={() => setAll(v => !v)}>{all ? 'Show featured credentials' : 'View all credentials'} <ChevronDown /></button>
-    </div></section>
-    <section id="recognition" className="section compact-section"><div className="container recognition-grid"><div><div className="section-heading small"><span>07 / RECOGNITION</span><h2>Moments that <em>matter.</em></h2></div><div className="awards-grid">{profile.honors.map((h, i) => <article key={h}><Award /><span>0{i + 1}</span><h3>{h}</h3></article>)}</div></div><div><div className="section-heading small"><span>08 / LANGUAGES</span><h2>Communication <em>across contexts.</em></h2></div><div className="language-list">{profile.languages.map(l => <article key={l.name}><Languages /><div><h3>{l.name}</h3><p>{l.level}</p></div></article>)}</div></div></div></section>
-  </>;
+  const selected = featuredTitles.map(title => certifications.find(c => c.title === title)).filter(Boolean);
+  return <section id="credentials" className="section soft-section"><div className="container">
+    <div className="section-intro"><span>Selected credentials</span><h2>A few signals of <em>continued learning.</em></h2></div>
+    <div className="credential-list">{selected.map(c => c && <article key={c.title}><BadgeCheck /><div><h3>{c.title.replace(' (React)', '')}</h3><p>{c.issuer} · {c.issued?.split(' ').pop()}</p></div></article>)}</div>
+    <div className="recognition-note">Recognition includes a People’s Choice Award and nominated artwork for MAI and MAP.</div>
+    <a className="text-link" href={profile.cvUrl} download>View all credentials <ArrowUpRight /></a>
+  </div></section>;
 }
