@@ -1,78 +1,53 @@
-import { motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Download, Linkedin, Mail, Menu, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { profile } from '../data/profile';
 import ThemeToggle from './ThemeToggle';
 
-const navLinks = [
-  { name: 'Home', href: '#home' },
-  { name: 'About', href: '#about' },
-  { name: 'Experience', href: '#projects' },
-  { name: 'Resume', href: '#resume' },
-  { name: 'Contact', href: '#contact' },
-];
+const links = [
+  ['Home', 'home'], ['About', 'about'], ['Work', 'work'], ['Skills', 'skills'],
+  ['Experience', 'experience'], ['Credentials', 'credentials'], ['Contact', 'contact'],
+] as const;
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
-      <div className="max-w-7xl mx-auto flex items-center justify-between glass-card px-6 py-3.5 rounded-[1.15rem] shadow-sm">
-        <motion.a
-          href="#home"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="text-xl font-display font-bold tracking-tight text-primary dark:text-white"
-        >
-          {profile.shortName}
-        </motion.a>
-
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link, i) => (
-            <motion.a
-              key={link.name}
-              href={link.href}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="text-sm font-semibold text-gray-800 hover:text-primary transition-colors dark:text-gray-200"
-            >
-              {link.name}
-            </motion.a>
-          ))}
-          <div className="h-6 w-[1px] bg-gray-300 dark:bg-gray-700 mx-2" />
-          <ThemeToggle />
+  const [open, setOpen] = useState(false); const [active, setActive] = useState('home');
+  const [hidden, setHidden] = useState(false); const lastY = useRef(0); const menuButton = useRef<HTMLButtonElement>(null); const menuPanel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => entries.forEach(e => e.isIntersecting && setActive(e.target.id)), { rootMargin: '-38% 0px -55%' });
+    links.forEach(([, id]) => { const el = document.getElementById(id); if (el) observer.observe(el); });
+    const onScroll = () => { const y = window.scrollY; setHidden(y > lastY.current && y > 160 && !open); lastY.current = y; };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { observer.disconnect(); window.removeEventListener('scroll', onScroll); };
+  }, [open]);
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    menuPanel.current?.querySelector<HTMLButtonElement>('button')?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setOpen(false); menuButton.current?.focus(); }
+      if (e.key === 'Tab' && menuPanel.current) {
+        const items = [...menuPanel.current.querySelectorAll<HTMLElement>('button,a[href]')];
+        if (!items.length) return; const first = items[0]; const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    };
+    window.addEventListener('keydown', onKey); return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', onKey); };
+  }, [open]);
+  const go = (id: string) => { setOpen(false); history.replaceState(null, '', `#${id}`); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); };
+  return <>
+    <motion.header className="nav-wrap" animate={{ y: hidden ? -110 : 0 }} transition={{ duration: .28 }}>
+      <nav className="nav-shell" aria-label="Primary navigation">
+        <button className="brand" onClick={() => go('home')} aria-label="Go to home"><span>KK</span><b>Kaung Khant Ko</b></button>
+        <div className="desktop-nav">
+          {links.map(([label, id]) => <button key={id} onClick={() => go(id)} className={active === id ? 'active' : ''} aria-current={active === id ? 'page' : undefined}>{label}</button>)}
         </div>
-
-        {/* Mobile Toggle */}
-        <div className="md:hidden flex items-center gap-4">
-          <ThemeToggle />
-          <button onClick={() => setIsOpen(!isOpen)} className="p-2">
-            {isOpen ? <X /> : <Menu />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="md:hidden absolute top-20 left-6 right-6 glass-card p-6 rounded-2xl shadow-lg flex flex-col gap-4"
-        >
-          {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              onClick={() => setIsOpen(false)}
-              className="text-lg font-semibold text-gray-900 hover:text-primary transition-colors dark:text-gray-100"
-            >
-              {link.name}
-            </a>
-          ))}
-        </motion.div>
-      )}
-    </nav>
-  );
+        <div className="nav-actions"><ThemeToggle /><a className="resume-chip" href={profile.cvUrl} download><Download size={16} /> Resume</a><button ref={menuButton} className="menu-button" onClick={() => setOpen(true)} aria-expanded={open} aria-controls="mobile-menu" aria-label="Open menu"><Menu /></button></div>
+      </nav>
+    </motion.header>
+    <AnimatePresence>{open && <motion.div ref={menuPanel} id="mobile-menu" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Site menu" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <div className="mobile-top"><span className="brand"><span>KK</span><b>Navigate</b></span><button className="icon-button" onClick={() => { setOpen(false); menuButton.current?.focus(); }} aria-label="Close menu"><X /></button></div>
+      <div className="mobile-links">{links.map(([label, id], i) => <button key={id} onClick={() => go(id)}><small>0{i + 1}</small>{label}</button>)}</div>
+      <div className="mobile-social"><a href={`mailto:${profile.email}`}><Mail size={18} /> Email</a><a href={profile.linkedin} target="_blank" rel="noreferrer"><Linkedin size={18} /> LinkedIn</a><a href={profile.cvUrl} download><Download size={18} /> Resume</a></div>
+    </motion.div>}</AnimatePresence>
+  </>;
 }

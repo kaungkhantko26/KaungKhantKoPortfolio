@@ -3,11 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (() => { const saved = localStorage.getItem('theme'); document.documentElement.classList.toggle('dark', saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)); })();
+    </script>
     <meta
       name="description"
-      content="Kaung Khant Ko is a computer science student and junior graphic designer in Myanmar, focused on branding, visual communication, and practical digital work."
+      content="Portfolio of Kaung Khant Ko, a Computer Science student, Junior Graphic Designer, Student Ambassador, and frontend developer combining design and technology."
     />
-    <title>Kaung Khant Ko | Computer Science Student & Designer</title>
+    <link rel="canonical" href="https://kaungkhantko.top/" />
+    <meta name="theme-color" content="#07090d" />
+    <meta property="og:type" content="profile" />
+    <meta property="og:url" content="https://kaungkhantko.top/" />
+    <meta property="og:title" content="Kaung Khant Ko | Designer & Frontend Developer" />
+    <meta property="og:description" content="Computer Science, visual design, and frontend development—brought together in one creative practice." />
+    <meta name="twitter:card" content="summary" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Kaung Khant Ko","url":"https://kaungkhantko.top","email":"mailto:kaungkkhant06@gmail.com","jobTitle":["Junior Graphic Designer","Student Ambassador"],"sameAs":["https://www.linkedin.com/in/kaungkhantko06/"]}</script>
+    <title>Kaung Khant Ko | Computer Science Student, Designer & Frontend Developer</title>
   </head>
   <body>
     <div id="root"></div>

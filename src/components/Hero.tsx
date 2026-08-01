@@ -1,130 +1,33 @@
-import { motion } from 'framer-motion';
-import Typewriter from 'typewriter-effect';
-import { ArrowRight, FileText, Globe, Linkedin, Mail, MapPin, Send } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowDown, ArrowUpRight, Code2, Download, Linkedin, Mail, MapPin, Palette } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { profile } from '../data/profile';
 
 export default function Hero() {
-  return (
-    <section id="home" className="min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          className="flex flex-col items-start"
-        >
-          <h2 className="section-kicker mb-5">
-            Open for work
-          </h2>
-          <h1 className="mb-5 text-5xl md:text-7xl font-display font-bold tracking-tight">
-            {profile.name}
-          </h1>
-          <div className="mb-7 text-3xl md:text-5xl font-display font-semibold leading-tight text-gray-800 dark:text-gray-200">
-            <Typewriter
-              options={{
-                strings: [...profile.heroLines],
-                autoStart: true,
-                loop: true,
-                delay: 50,
-                deleteSpeed: 30,
-              }}
-            />
-          </div>
-          <p className="mb-10 max-w-2xl text-xl leading-9 text-gray-800 dark:text-gray-200">
-            {profile.summary}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <motion.a
-              href="#projects"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="primary-button"
-            >
-              View Experience <ArrowRight className="w-5 h-5" />
-            </motion.a>
-            <motion.a
-              href={profile.cvUrl}
-              target="_blank"
-              rel="noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="secondary-button"
-            >
-              Download Resume <FileText className="w-5 h-5 text-primary" />
-            </motion.a>
-            <div className="flex items-center gap-3">
-              <a
-                href={profile.website}
-                target="_blank"
-                rel="noreferrer"
-                className="icon-button"
-                aria-label="Website"
-              >
-                <Globe className="w-6 h-6" />
-              </a>
-              <a
-                href={profile.linkedin}
-                target="_blank"
-                rel="noreferrer"
-                className="icon-button"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-6 h-6" />
-              </a>
-              <a href={`mailto:${profile.email}`} className="icon-button" aria-label="Email">
-                <Mail className="w-6 h-6" />
-              </a>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="relative"
-        >
-          <div className="section-panel relative z-10 w-full overflow-hidden rounded-[1.75rem] p-6 md:p-8">
-            <div className="rounded-[1.35rem] border border-primary/10 bg-white/60 p-8 dark:bg-white/3">
-              <div className="section-kicker border-primary/10 bg-white dark:bg-gray-950/80">
-                Computer Science + Design
-              </div>
-
-              <div className="mt-8 space-y-4">
-                {profile.quickFacts.map((fact) => (
-                  <div key={fact.label} className="rounded-2xl border border-primary/8 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-950/80">
-                    <p className="text-xs uppercase tracking-[0.25em] text-gray-700 dark:text-gray-300">{fact.label}</p>
-                    <p className="mt-2 text-xl font-semibold leading-snug">{fact.value}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl border border-primary/8 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-950/80">
-                  <div className="flex items-center gap-3 text-primary">
-                    <MapPin className="w-5 h-5" />
-                    <span className="font-medium">Base</span>
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-gray-700 dark:text-gray-300">{profile.location}</p>
-                </div>
-                <div className="rounded-2xl border border-primary/8 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-950/80">
-                  <div className="flex items-center gap-3 text-primary">
-                    <Send className="w-5 h-5" />
-                    <span className="font-medium">Direct contact</span>
-                  </div>
-                  <a href={`mailto:${profile.email}`} className="mt-3 block text-sm leading-relaxed text-gray-700 hover:text-primary dark:text-gray-300">
-                    {profile.email}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-primary/12 blur-3xl" />
-          <div className="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-secondary/12 blur-3xl" />
-        </motion.div>
-      </div>
-    </section>
-  );
+  const [role, setRole] = useState(0); const reduced = useReducedMotion();
+  useEffect(() => { if (reduced) return; const timer = window.setInterval(() => setRole(v => (v + 1) % profile.roles.length), 2600); return () => clearInterval(timer); }, [reduced]);
+  return <section id="home" className="hero section">
+    <div className="container hero-grid">
+      <motion.div className="hero-copy" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8 }}>
+        <span className="availability"><i /> Open for work</span>
+        <p className="eyebrow">Computer Science <span>×</span> Visual Design</p>
+        <h1><span>Kaung Khant Ko</span>I design digital experiences <em>and build them with code.</em></h1>
+        <div className="role-line" aria-live="polite"><span>Currently</span><motion.b key={role} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>{profile.roles[role]}</motion.b></div>
+        <p className="hero-summary">{profile.summary}</p>
+        <div className="hero-actions"><a className="button primary" href="#work">Explore my work <ArrowDown /></a><a className="button secondary" href={profile.cvUrl} download>Download resume <Download /></a><a className="text-link" href="#contact">Let’s work together <ArrowUpRight /></a></div>
+        <div className="social-row"><a href={profile.linkedin} target="_blank" rel="noreferrer"><Linkedin /> LinkedIn</a><a href={`mailto:${profile.email}`}><Mail /> Email</a></div>
+      </motion.div>
+      <motion.div className="identity-stage" initial={{ opacity: 0, scale: .94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: .9, delay: .15 }}>
+        <div className="orbit-label label-code"><Code2 /> TypeScript</div><div className="orbit-label label-design"><Palette /> Graphic Design</div>
+        <div className="identity-card">
+          <div className="card-toolbar"><span /><span /><span /><small>identity.card</small></div>
+          <div className="monogram"><span>K</span><span>K</span></div>
+          <div><p className="mono-label">DESIGNER + DEVELOPER</p><h2>{profile.name}</h2><p className="location"><MapPin /> {profile.location}</p></div>
+          <div className="card-stack"><span>React</span><span>Branding</span><span>Python</span><span>Cybersecurity</span></div>
+          <div className="card-status"><i /> Available for collaboration <ArrowUpRight /></div>
+        </div>
+      </motion.div>
+    </div>
+    <div className="container stats-strip" aria-label="Portfolio highlights"><div><strong>15+</strong><span>Verified credentials</span></div><div><strong>2</strong><span>Active professional roles</span></div><div><strong>4</strong><span>Languages</span></div><div><strong>Design + Tech</strong><span>One creative practice</span></div></div>
+  </section>;
 }

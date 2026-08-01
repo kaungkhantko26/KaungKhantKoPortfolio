@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://kaungkhantko.top/sitemap.xml
