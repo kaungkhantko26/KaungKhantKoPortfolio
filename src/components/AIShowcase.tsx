@@ -42,10 +42,10 @@ export default function AIShowcase() {
     <section id="home" className="ai-hero">
       <div className="ai-grid-bg" aria-hidden="true"/>
       <div className="container ai-hero-grid">
-        <motion.div initial={{opacity:0,y:22}} animate={{opacity:1,y:0}} transition={{duration:.65}}>
+        <motion.div initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{duration:.35}}>
           <div className="ai-status"><i/> Available for AI & product engineering opportunities</div>
           <p className="ai-kicker">Hi, I’m Kaung Khant Ko.</p>
-          <h1>I build intelligent products that are <em>useful, explainable, and well designed.</em></h1>
+          <h1>Building AI products <em>that solve real problems.</em></h1>
           <p className="ai-lead">Computer Science student and product builder working across AI applications, Python systems, full-stack development, security, and interface engineering.</p>
           <div className="ai-actions"><a className="ai-btn primary" href="#projects">View projects <ArrowRight/></a><a className="ai-btn" href={profile.cvUrl} download>Résumé</a><a className="ai-icon-link" href={profile.github} target="_blank" rel="noreferrer" aria-label="GitHub"><Github/></a><a className="ai-icon-link" href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin/></a></div>
         </motion.div>
@@ -78,7 +78,7 @@ export default function AIShowcase() {
 
     <section id="capabilities" className="ai-section"><div className="container">
       <SectionTitle eyebrow="Capabilities" title="Skills connected to evidence—not percentages." copy="Status labels distinguish demonstrated strengths from areas I am actively developing."/>
-      <div className="capability-grid">{capabilities.map((c,i)=><motion.article key={c[0]} className="capability" initial={{opacity:0,y:16}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{delay:i*.04}}><div><span>{c[1]}</span><b>0{i+1}</b></div><h3>{c[0]}</h3><p>{c[2]}</p><code>{c[3]}</code><small>Evidence · {c[4]}</small></motion.article>)}</div>
+      <div className="capability-grid">{capabilities.map((c,i)=><article key={c[0]} className="capability"><div><span>{c[1]}</span><b>0{i+1}</b></div><h3>{c[0]}</h3><p>{c[2]}</p><code>{c[3]}</code><small>Evidence · {c[4]}</small></article>)}</div>
       <div className="knowledge-graph" aria-label="Technology relationship graph"><div className="graph-core">Product<br/>Engineering</div>{['Python → AI APIs → Agents','React → TypeScript → Interfaces','Security → Evidence → Trust','CI/CD → Releases → Feedback'].map((x,i)=><div className={'graph-node n'+i} key={x}>{x}</div>)}</div>
     </div></section>
 
