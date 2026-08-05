@@ -36,6 +36,7 @@ export const certifications: CertificationItem[] = [
 export const profile = {
   name: 'Kaung Khant Ko', role: 'Computer Science Student', location: 'Yangon, Myanmar',
   phone: '+95 9 889 750 033', email: 'kaungkkhant06@gmail.com', website: 'https://kaungkhantko.top',
+  github: 'https://github.com/kaungkhantko26',
   linkedin: 'https://www.linkedin.com/in/kaungkhantko06/', cvUrl: '/kaung-khant-ko-linkedin-profile.pdf',
   roles: ['Computer Science Student', 'Junior Graphic Designer', 'Frontend Developer', 'Creative Technologist', 'Student Ambassador'],
   summary: 'I am a Computer Science student and Junior Graphic Designer with experience in visual design, branding, social media, and frontend development. I enjoy combining technology and creativity to build practical, polished digital experiences.',
