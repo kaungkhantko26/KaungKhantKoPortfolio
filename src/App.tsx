@@ -5,6 +5,13 @@ import { certifications, profile } from './data/profile';
 
 type RoutePath = '/' | '/design' | '/developer' | '/case-study/austonian-hub';
 
+const routes: RoutePath[] = ['/', '/design', '/developer', '/case-study/austonian-hub'];
+
+function currentRoute(): RoutePath {
+  const normalized = location.pathname.replace(/\/+$/, '') || '/';
+  return routes.includes(normalized as RoutePath) ? normalized as RoutePath : '/';
+}
+
 const colors = ['#06245f', '#f8c900', '#f7f3ec', '#eef2f7', '#d94a4a'];
 const screens = [
   ['Home', '/austonian/home.png', 'Priority-first dashboard'],
@@ -107,10 +114,10 @@ function CaseStudy() {
 }
 
 function App() {
-  const [path, setPath] = useState<RoutePath>((location.pathname as RoutePath) || '/');
+  const [path, setPath] = useState<RoutePath>(currentRoute);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: .001 });
-  useEffect(() => { const update = () => setPath((location.pathname as RoutePath) || '/'); addEventListener('popstate', update); return () => removeEventListener('popstate', update); }, []);
+  useEffect(() => { const update = () => setPath(currentRoute()); addEventListener('popstate', update); return () => removeEventListener('popstate', update); }, []);
   const page = path === '/design' ? <DesignRoute /> : path === '/developer' ? <DeveloperRoute /> : path === '/case-study/austonian-hub' ? <CaseStudy /> : <Landing />;
   return <><a className="skip-link" href="#main">Skip to content</a><motion.div className="scroll-progress" style={{ scaleX }} /><AnimatePresence mode="wait"><motion.main id="main" key={path} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .28 }}>{page}</motion.main></AnimatePresence></>;
 }
