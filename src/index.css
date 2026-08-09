@@ -60,3 +60,32 @@
   .footer-signoff{display:flex;flex-direction:column;gap:6px}.connect:after{display:none}
 }
 @media(max-width:640px){.about-section .stat-grid{grid-template-columns:1fr}.footer-signoff{width:100%;margin-top:18px}}
+
+/* Composition polish: one typographic hierarchy and one control rhythm. */
+.landing h1,.route-hero .hero-copy h1,.case-hero h1,.section-heading h2{font-weight:700}
+.landing h1{font-size:clamp(52px,6.4vw,82px);line-height:.98}
+.site-header .brand,.site-header nav button{min-height:44px;display:inline-flex;align-items:center}
+.site-header nav button{padding:0 4px}
+.menu-button{width:44px;height:44px;align-items:center;justify-content:center}
+.pill{min-height:58px;padding-inline:24px;justify-content:center}
+.project-feature .pill{width:237px}
+.code-card b{min-height:48px;display:flex;align-items:center;justify-content:center}
+.case-cta{display:inline-flex;min-height:58px;align-items:center;justify-content:center;background:var(--gold);color:var(--navy);padding:0 22px;margin-top:32px;border-radius:999px;font-weight:700;text-align:center}
+.contact-links a{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+
+@media(max-width:960px){
+  .menu-button{display:inline-flex}
+  .route-hero-inner,.route-hero .hero-copy{width:100%}
+  .route-hero .selected-card,.route-hero .code-card{width:min(100%,390px)}
+  .case-cta{width:min(100%,430px)}
+}
+
+@media(max-width:640px){
+  .route-hero{padding:112px 24px 64px}
+  .route-hero-inner{gap:40px}
+  .route-hero .hero-copy h1{line-height:1.03}
+  .hero-copy>p:nth-of-type(2){line-height:1.5}
+  .route-card{min-height:283px}
+  .route-card b{min-height:48px}
+  .case-hero{padding-left:24px;padding-right:24px}
+}
