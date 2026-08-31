@@ -7,6 +7,7 @@ const routeEntries = [
   'design/su-yet-designs/index.html',
   'developer/index.html',
   'case-study/austonian-hub/index.html',
+  'case-study/cursor-ai-hackathon/index.html',
   '404.html',
 ];
 
