@@ -14,14 +14,18 @@
  */
 import { readFile, readdir, unlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import sharp from 'sharp';
 
 const FILE_KEY = process.env.FIGMA_FILE_KEY || 'Rq9iC81fj5ho5T2vBNt9oV';
 const TOKEN = process.env.FIGMA_TOKEN;
 const ASSET_DIR = 'public/su-yet';
 const DATA_FILE = 'src/data/suYet.ts';
 const NOTES_FILE = 'scripts/su-yet-notes.json';
-const IMAGE_FORMAT = 'jpg';
-const IMAGE_SCALE = 2;
+const SOURCE_FORMAT = 'png'; // crisp source from Figma; recompressed below
+const SOURCE_SCALE = 2;
+const OUT_EXT = 'webp';
+const OUT_MAX_DIM = 1280; // posters display well under 640px; 1280 covers the lightbox + retina
+const OUT_QUALITY = 78;
 const NAME_RE = /^\s*suyet\s*[—:-]\s*/i;
 const SERIES_STOPWORDS = /^(editorial|reference|centered|diagonal|draft|wip|v\d)/i;
 
@@ -102,25 +106,32 @@ async function main() {
       series: deriveSeries(frame),
       year,
       medium: 'Digital poster · 1080×1080',
-      src: `/su-yet/${slugify(title)}.${IMAGE_FORMAT}`,
+      src: `/su-yet/${slugify(title)}.${OUT_EXT}`,
       note: notes[slugify(title)] || '',
       slug: slugify(title),
     };
   });
 
   const { images } = await api(
-    `/images/${FILE_KEY}?ids=${pieces.map((p) => encodeURIComponent(p.id)).join(',')}&format=${IMAGE_FORMAT}&scale=${IMAGE_SCALE}`,
+    `/images/${FILE_KEY}?ids=${pieces.map((p) => encodeURIComponent(p.id)).join(',')}&format=${SOURCE_FORMAT}&scale=${SOURCE_SCALE}`,
   );
 
   const keep = new Set();
   for (const p of pieces) {
     const url = images[p.id];
     if (!url) throw new Error(`Figma returned no image for ${p.title} (${p.id})`);
-    const bytes = Buffer.from(await fetch(url).then((r) => r.arrayBuffer()));
-    const filename = `${p.slug}.${IMAGE_FORMAT}`;
-    await writeFile(join(ASSET_DIR, filename), bytes);
+    const source = Buffer.from(await fetch(url).then((r) => r.arrayBuffer()));
+    const out = await sharp(source)
+      .resize(OUT_MAX_DIM, OUT_MAX_DIM, { fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: OUT_QUALITY })
+      .toBuffer();
+    const filename = `${p.slug}.${OUT_EXT}`;
+    await writeFile(join(ASSET_DIR, filename), out);
     keep.add(filename);
-    console.log(`[sync-su-yet] ${p.no} ${p.title} → ${filename} (${(bytes.length / 1024).toFixed(0)} KB)`);
+    console.log(
+      `[sync-su-yet] ${p.no} ${p.title} → ${filename} ` +
+        `(${(source.length / 1024).toFixed(0)} KB → ${(out.length / 1024).toFixed(0)} KB)`,
+    );
   }
 
   for (const existing of await readdir(ASSET_DIR)) {
