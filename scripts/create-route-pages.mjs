@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path';
 const outputDirectory = 'dist';
 const routeEntries = [
   'design/index.html',
+  'design/su-yet-designs/index.html',
   'developer/index.html',
   'case-study/austonian-hub/index.html',
   '404.html',
