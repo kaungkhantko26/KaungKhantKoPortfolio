@@ -30,4 +30,7 @@ posters publish themselves.
 - **Setup (once):** add a repository secret `FIGMA_TOKEN` (GitHub → Settings →
   Secrets and variables → Actions) holding a Figma personal access token with
   read access. Without it the build keeps the committed fallback in `src/data/suYet.ts`.
+- **Wall-label notes:** the sync only pulls image + title + series from Figma. The
+  curatorial sentence under each poster lives in `scripts/su-yet-notes.json`, keyed
+  by slug (e.g. `"open-source"`); edit it there and the next sync keeps it.
 - **Run locally:** `FIGMA_TOKEN=... node scripts/sync-su-yet.mjs`

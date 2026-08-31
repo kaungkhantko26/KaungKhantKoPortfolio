@@ -12,13 +12,14 @@
  * With no FIGMA_TOKEN the script is a no-op and the committed fallback in
  * src/data/suYet.ts is kept — so local builds and forks keep working.
  */
-import { readdir, unlink, writeFile } from 'node:fs/promises';
+import { readFile, readdir, unlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const FILE_KEY = process.env.FIGMA_FILE_KEY || 'Rq9iC81fj5ho5T2vBNt9oV';
 const TOKEN = process.env.FIGMA_TOKEN;
 const ASSET_DIR = 'public/su-yet';
 const DATA_FILE = 'src/data/suYet.ts';
+const NOTES_FILE = 'scripts/su-yet-notes.json';
 const IMAGE_FORMAT = 'jpg';
 const IMAGE_SCALE = 2;
 const NAME_RE = /^\s*suyet\s*[—:-]\s*/i;
@@ -77,6 +78,7 @@ function deriveNumber(frame, fallbackIndex) {
 }
 
 async function main() {
+  const notes = JSON.parse(await readFile(NOTES_FILE, 'utf8').catch(() => '{}'));
   const file = await api(`/files/${FILE_KEY}?depth=4`);
   const canvases = file.document.children || [];
   const frames = canvases
@@ -101,7 +103,7 @@ async function main() {
       year,
       medium: 'Digital poster · 1080×1080',
       src: `/su-yet/${slugify(title)}.${IMAGE_FORMAT}`,
-      note: '',
+      note: notes[slugify(title)] || '',
       slug: slugify(title),
     };
   });
