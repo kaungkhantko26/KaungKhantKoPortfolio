@@ -5,6 +5,9 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    # Pull the latest Su Yet Designs posters from Figma four times a day.
+    - cron: '0 */6 * * *'
 
 permissions:
   contents: read
@@ -32,6 +35,12 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Sync Su Yet Designs from Figma
+        run: node scripts/sync-su-yet.mjs
+        env:
+          FIGMA_TOKEN: ${{ secrets.FIGMA_TOKEN }}
+          FIGMA_FILE_KEY: Rq9iC81fj5ho5T2vBNt9oV
 
       - name: Build site
         run: pnpm run build
