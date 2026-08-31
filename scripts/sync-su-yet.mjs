@@ -1,0 +1,172 @@
+/**
+ * Pull the Su Yet Designs poster collection from Figma into the site.
+ *
+ * Reads every top-level 1080×1080 frame named `SUYET — <Title>` (optionally
+ * `SUYET — <Title> / <Series>`) from the linked Figma file, renders each to an
+ * image under public/su-yet/, and regenerates src/data/suYet.ts.
+ *
+ * Env:
+ *   FIGMA_TOKEN     Figma personal access token with read access (required).
+ *   FIGMA_FILE_KEY  Figma file key (defaults to the studio file below).
+ *
+ * With no FIGMA_TOKEN the script is a no-op and the committed fallback in
+ * src/data/suYet.ts is kept — so local builds and forks keep working.
+ */
+import { readdir, unlink, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
+const FILE_KEY = process.env.FIGMA_FILE_KEY || 'Rq9iC81fj5ho5T2vBNt9oV';
+const TOKEN = process.env.FIGMA_TOKEN;
+const ASSET_DIR = 'public/su-yet';
+const DATA_FILE = 'src/data/suYet.ts';
+const IMAGE_FORMAT = 'jpg';
+const IMAGE_SCALE = 2;
+const NAME_RE = /^\s*suyet\s*[—:-]\s*/i;
+const SERIES_STOPWORDS = /^(editorial|reference|centered|diagonal|draft|wip|v\d)/i;
+
+if (!TOKEN) {
+  console.warn('[sync-su-yet] FIGMA_TOKEN not set — keeping committed fallback.');
+  process.exit(0);
+}
+
+const api = (path) =>
+  fetch(`https://api.figma.com/v1${path}`, { headers: { 'X-Figma-Token': TOKEN } }).then(async (r) => {
+    if (!r.ok) throw new Error(`Figma API ${r.status} ${r.statusText} for ${path}: ${await r.text()}`);
+    return r.json();
+  });
+
+const titleCase = (s) =>
+  s
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(' ');
+
+const slugify = (s) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') || 'untitled';
+
+function findText(node, re) {
+  if (!node) return null;
+  if (node.type === 'TEXT' && re.test(node.name || '') && node.characters) return node.characters.trim();
+  for (const child of node.children || []) {
+    const hit = findText(child, re);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+function deriveSeries(frame) {
+  const fromName = (frame.name.replace(NAME_RE, '').split(/\s+\/\s+/)[1] || '').trim();
+  if (fromName && !SERIES_STOPWORDS.test(fromName)) return fromName;
+  const masthead = findText(frame, /masthead|series/i);
+  if (masthead) {
+    const tail = masthead.split('/').pop().trim();
+    if (tail && !/^suyet$/i.test(tail)) return titleCase(tail);
+  }
+  return '';
+}
+
+function deriveNumber(frame, fallbackIndex) {
+  const edition = findText(frame, /edition/i) || frame.name;
+  const m = edition.match(/\b(\d{1,3})\b/);
+  return m ? m[1].padStart(2, '0') : String(fallbackIndex + 1).padStart(2, '0');
+}
+
+async function main() {
+  const file = await api(`/files/${FILE_KEY}?depth=4`);
+  const canvases = file.document.children || [];
+  const frames = canvases
+    .flatMap((c) => c.children || [])
+    .filter((n) => n.type === 'FRAME' && NAME_RE.test(n.name || ''));
+
+  if (frames.length === 0) {
+    console.warn('[sync-su-yet] No frames named "SUYET — ..." found — keeping committed fallback.');
+    process.exit(0);
+  }
+
+  frames.sort((a, b) => (a.absoluteBoundingBox?.x ?? 0) - (b.absoluteBoundingBox?.x ?? 0));
+
+  const year = String(new Date().getFullYear());
+  const pieces = frames.map((frame, i) => {
+    const title = frame.name.replace(NAME_RE, '').split(/\s+\/\s+/)[0].trim() || `Untitled ${i + 1}`;
+    return {
+      id: frame.id,
+      no: deriveNumber(frame, i),
+      title,
+      series: deriveSeries(frame),
+      year,
+      medium: 'Digital poster · 1080×1080',
+      src: `/su-yet/${slugify(title)}.${IMAGE_FORMAT}`,
+      note: '',
+      slug: slugify(title),
+    };
+  });
+
+  const { images } = await api(
+    `/images/${FILE_KEY}?ids=${pieces.map((p) => encodeURIComponent(p.id)).join(',')}&format=${IMAGE_FORMAT}&scale=${IMAGE_SCALE}`,
+  );
+
+  const keep = new Set();
+  for (const p of pieces) {
+    const url = images[p.id];
+    if (!url) throw new Error(`Figma returned no image for ${p.title} (${p.id})`);
+    const bytes = Buffer.from(await fetch(url).then((r) => r.arrayBuffer()));
+    const filename = `${p.slug}.${IMAGE_FORMAT}`;
+    await writeFile(join(ASSET_DIR, filename), bytes);
+    keep.add(filename);
+    console.log(`[sync-su-yet] ${p.no} ${p.title} → ${filename} (${(bytes.length / 1024).toFixed(0)} KB)`);
+  }
+
+  for (const existing of await readdir(ASSET_DIR)) {
+    if (/\.(png|jpe?g|webp)$/i.test(existing) && !keep.has(existing)) {
+      await unlink(join(ASSET_DIR, existing));
+      console.log(`[sync-su-yet] removed stale ${existing}`);
+    }
+  }
+
+  const entries = pieces
+    .map((p) => {
+      const row = { no: p.no, title: p.title, series: p.series, year: p.year, medium: p.medium, src: p.src, note: p.note };
+      return `  ${JSON.stringify(row)},`;
+    })
+    .join('\n');
+
+  const out = `/**
+ * Su Yet Designs — poster collection shown at /design/su-yet-designs.
+ *
+ * AUTO-GENERATED by scripts/sync-su-yet.mjs from Figma file ${FILE_KEY}.
+ * Do not edit by hand — changes are overwritten on the next sync.
+ *
+ * To add a poster: create a 1080×1080 frame in Figma named \`SUYET — <Title>\`
+ * (an optional \` / <Series>\` segment sets the series label).
+ */
+export type SuYetPiece = {
+  no: string;
+  title: string;
+  series: string;
+  year: string;
+  medium: string;
+  src: string;
+  note: string;
+};
+
+export const suYetSyncedAt: string | null = ${JSON.stringify(new Date().toISOString())};
+
+export const suYetPieces: SuYetPiece[] = [
+${entries}
+];
+`;
+
+  await writeFile(DATA_FILE, out);
+  console.log(`[sync-su-yet] wrote ${DATA_FILE} with ${pieces.length} piece(s).`);
+}
+
+main().catch((err) => {
+  // Never block a deploy on Figma being unreachable — keep the committed fallback.
+  console.error(`[sync-su-yet] failed, keeping committed fallback: ${err.message}`);
+  process.exit(0);
+});
