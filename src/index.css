@@ -166,3 +166,16 @@
 .demo-cta a svg{width:18px}
 .case-section.blue .demo-cta+.flow-row{margin-top:40px}
 @media(max-width:640px){.demo-cta{grid-template-columns:1fr}}
+
+/* Developer route — live GitHub project cards */
+.repo-links{display:flex;flex-wrap:wrap;gap:18px;margin-top:18px}
+.repo-grid .repo-links a{margin-top:0}
+.repo-grid article>div b svg{width:12px;height:12px;vertical-align:-2px;margin-right:2px}
+.repo-all{display:inline-flex;align-items:center;gap:10px;margin-top:34px;font-weight:700;color:var(--yellow)}
+.repo-all svg{width:16px;transition:transform .25s var(--ease)}
+.repo-all:hover svg{transform:translateX(4px)}
+
+/* Animated nav underline */
+.site-header nav button{position:relative}
+.site-header nav button::after{content:"";position:absolute;left:4px;right:4px;bottom:0;height:2px;background:currentColor;border-radius:2px;transform:scaleX(0);transform-origin:left;transition:transform .28s var(--ease)}
+.site-header nav button:hover::after{transform:scaleX(1)}
