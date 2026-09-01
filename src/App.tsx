@@ -1,4 +1,4 @@
-import { AnimatePresence, MotionConfig, animate, motion, useInView, useScroll, useSpring } from 'framer-motion';
+import { AnimatePresence, MotionConfig, animate, motion, useInView, useMotionValue, useReducedMotion, useScroll, useSpring } from 'framer-motion';
 import { ArrowLeft, ArrowRight, ExternalLink, Github, Linkedin, Mail, Menu, Star, X } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { certifications, profile } from './data/profile';
@@ -220,13 +220,59 @@ function SuYetDesigns() {
   </div>;
 }
 
+type CursorState = 'hidden' | 'idle' | 'hover' | 'down';
+
+function Cursor() {
+  const reduce = useReducedMotion();
+  const [state, setState] = useState<CursorState>('hidden');
+  const x = useMotionValue(-100);
+  const y = useMotionValue(-100);
+  const rx = useSpring(x, { stiffness: 380, damping: 30, mass: 0.5 });
+  const ry = useSpring(y, { stiffness: 380, damping: 30, mass: 0.5 });
+
+  useEffect(() => {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const root = document.documentElement;
+    root.classList.add('has-cursor');
+    const interactive = 'a,button,[role="button"],input,textarea,select,label,summary';
+    const isInteractive = (t: EventTarget | null) => !!(t instanceof Element && t.closest(interactive));
+    const move = (e: MouseEvent) => {
+      x.set(e.clientX);
+      y.set(e.clientY);
+      setState(s => (s === 'hidden' ? (isInteractive(e.target) ? 'hover' : 'idle') : s));
+    };
+    const over = (e: MouseEvent) => setState(isInteractive(e.target) ? 'hover' : 'idle');
+    const down = () => setState(s => (s === 'hidden' ? s : 'down'));
+    const up = (e: MouseEvent) => setState(isInteractive(e.target) ? 'hover' : 'idle');
+    const leave = () => setState('hidden');
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseover', over);
+    window.addEventListener('mousedown', down);
+    window.addEventListener('mouseup', up);
+    document.addEventListener('mouseleave', leave);
+    return () => {
+      root.classList.remove('has-cursor');
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseover', over);
+      window.removeEventListener('mousedown', down);
+      window.removeEventListener('mouseup', up);
+      document.removeEventListener('mouseleave', leave);
+    };
+  }, [x, y]);
+
+  return <div className="cursor-layer" data-state={state} aria-hidden="true">
+    <motion.div className="cursor-dot" style={{ x, y }} />
+    <motion.div className="cursor-ring" style={{ x: reduce ? x : rx, y: reduce ? y : ry }} />
+  </div>;
+}
+
 function App() {
   const [path, setPath] = useState<RoutePath>(currentRoute);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: .001 });
   useEffect(() => { const update = () => setPath(currentRoute()); addEventListener('popstate', update); return () => removeEventListener('popstate', update); }, []);
   const page = path === '/design' ? <DesignRoute /> : path === '/design/su-yet-designs' ? <SuYetDesigns /> : path === '/developer' ? <DeveloperRoute /> : path === '/case-study/austonian-hub' ? <CaseStudy /> : path === '/case-study/cursor-ai-hackathon' ? <HackathonCaseStudy /> : <Landing />;
-  return <MotionConfig reducedMotion="user"><a className="skip-link" href="#main">Skip to content</a><motion.div className="scroll-progress" style={{ scaleX }} /><AnimatePresence mode="wait"><motion.main id="main" key={path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: .32, ease: [0.22, 1, 0.36, 1] }}>{page}</motion.main></AnimatePresence></MotionConfig>;
+  return <MotionConfig reducedMotion="user"><a className="skip-link" href="#main">Skip to content</a><Cursor /><motion.div className="scroll-progress" style={{ scaleX }} /><AnimatePresence mode="wait"><motion.main id="main" key={path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: .32, ease: [0.22, 1, 0.36, 1] }}>{page}</motion.main></AnimatePresence></MotionConfig>;
 }
 
 export default App;
