@@ -1,7 +1,7 @@
 /**
  * GitHub profile snapshot for the Developer route — committed fallback.
- * Refreshed live in the browser by src/lib/github.ts; regenerate with
- * scripts/sync-github.mjs (or just let the live fetch update it on load).
+ * Refreshed live in the browser by src/lib/github.ts. The featured project
+ * list is curated in that file; this only supplies counts + live star/language.
  */
 export type Repo = {
   name: string;
@@ -35,8 +35,35 @@ export const githubSnapshot: GitHubSnapshot = {
     "TypeScript"
   ],
   "deployedCount": 18,
-  "fetchedAt": "2026-09-01T03:27:39Z",
+  "fetchedAt": "2026-09-01T04:22:10Z",
   "repos": [
+    {
+      "name": "Augorithm",
+      "description": "Visual pseudocode editor, flowchart generator, and algorithm runner for macOS, Windows, and iPad—with English and Burmese support.",
+      "language": "TypeScript",
+      "stars": 1,
+      "url": "https://github.com/kaungkhantko26/Augorithm",
+      "homepage": "https://augorithm-for-students.vercel.app",
+      "pushedAt": "2026-08-04T20:23:33Z"
+    },
+    {
+      "name": "Pyan-Thone",
+      "description": "",
+      "language": "TypeScript",
+      "stars": 0,
+      "url": "https://github.com/kaungkhantko26/Pyan-Thone",
+      "homepage": "https://kaungkhantko26.github.io/Pyan-Thone/",
+      "pushedAt": "2026-08-29T08:57:57Z"
+    },
+    {
+      "name": "SafeMind",
+      "description": "",
+      "language": "JavaScript",
+      "stars": 0,
+      "url": "https://github.com/kaungkhantko26/SafeMind",
+      "homepage": "https://safemind.kaungkhantko.studio",
+      "pushedAt": "2026-07-19T07:09:45Z"
+    },
     {
       "name": "kaungkhantkoportfolio",
       "description": "Kaung Khant Ko — Personal Portfolio Website Welcome! This repository contains the source files for my personal portfolio website — a resume and showcase site highlighting my skills, experience, and contact information.",
@@ -44,7 +71,7 @@ export const githubSnapshot: GitHubSnapshot = {
       "stars": 2,
       "url": "https://github.com/kaungkhantko26/kaungkhantkoportfolio",
       "homepage": "https://kaungkhantko.top/",
-      "pushedAt": "2026-08-31T15:11:14Z"
+      "pushedAt": "2026-09-01T03:42:47Z"
     },
     {
       "name": "Ktool",
@@ -72,15 +99,6 @@ export const githubSnapshot: GitHubSnapshot = {
       "url": "https://github.com/kaungkhantko26/hexora",
       "homepage": "https://hexora.kaungkhantko.top/",
       "pushedAt": "2026-03-19T13:09:28Z"
-    },
-    {
-      "name": "Augorithm",
-      "description": "Visual pseudocode editor, flowchart generator, and algorithm runner for macOS, Windows, and iPad—with English and Burmese support.",
-      "language": "TypeScript",
-      "stars": 1,
-      "url": "https://github.com/kaungkhantko26/Augorithm",
-      "homepage": "https://augorithm-for-students.vercel.app",
-      "pushedAt": "2026-08-04T20:23:33Z"
     },
     {
       "name": "kaungkhantko26",
@@ -126,24 +144,6 @@ export const githubSnapshot: GitHubSnapshot = {
       "url": "https://github.com/kaungkhantko26/Habit-tracker",
       "homepage": "http://habittracker.kaungkhantko.top/",
       "pushedAt": "2026-03-31T02:17:42Z"
-    },
-    {
-      "name": "Bee",
-      "description": "Home service booking platform connecting customers with service providers through a simple web interface.",
-      "language": "TypeScript",
-      "stars": 1,
-      "url": "https://github.com/kaungkhantko26/Bee",
-      "homepage": "https://bee.kaungkhantko.top/",
-      "pushedAt": "2026-03-21T19:38:06Z"
-    },
-    {
-      "name": "KaungKhantKo",
-      "description": "",
-      "language": "CSS",
-      "stars": 1,
-      "url": "https://github.com/kaungkhantko26/KaungKhantKo",
-      "homepage": "https://kaungkhantkocontents.site/",
-      "pushedAt": "2025-12-15T03:11:45Z"
     }
   ]
 };

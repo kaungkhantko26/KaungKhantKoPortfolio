@@ -2,15 +2,45 @@ import { useEffect, useState } from 'react';
 import { githubSnapshot, type GitHubSnapshot, type Repo } from '../data/github';
 
 const API = `https://api.github.com/users/${githubSnapshot.login}/repos?per_page=100&sort=pushed`;
-// Repos that shouldn't show up as "featured work" (this site, the profile readme).
-const HIDE_FEATURED = new Set(['kaungkhantkoportfolio', 'kaungkhantko26', 'portfolio-kxant']);
 const HIDE_LANGUAGES = new Set(['PLpgSQL']);
+
+/** Hand-picked projects shown on the developer route, newest first. */
+const FEATURED: { repo: string; title: string; blurb: string; homepage?: string }[] = [
+  {
+    repo: 'Pyan-Thone',
+    title: 'Pyan Thone',
+    blurb:
+      'Trusted second-hand marketplace with condition evidence on every listing and verified seller trust — built for the Cursor AI Hackathon Myanmar.',
+    homepage: 'https://pyan-thone-sigma.vercel.app',
+  },
+  {
+    repo: 'SafeMind',
+    title: 'SafeMind',
+    blurb: 'A cybersecurity MVP focused on practical, everyday online safety for people who are not security experts.',
+  },
+  {
+    repo: 'Augorithm',
+    title: 'Augorithm',
+    blurb: 'Visual pseudocode editor, flowchart generator, and algorithm runner that helps students see how code executes.',
+  },
+];
+
+export type FeaturedRepo = {
+  name: string;
+  title: string;
+  description: string;
+  language: string;
+  stars: number;
+  url: string;
+  homepage: string;
+};
 
 /**
  * The committed snapshot in src/data/github.ts renders immediately; a live call
- * to the public GitHub API then refreshes counts and the project list on mount.
- * The API allows 60 unauthenticated requests per hour per IP — plenty for a
- * portfolio — and any failure just keeps the snapshot.
+ * to the public GitHub API then refreshes the counts on mount. The API allows 60
+ * unauthenticated requests per hour per IP — plenty for a portfolio — and any
+ * failure just keeps the snapshot. The featured list is curated (FEATURED above);
+ * GitHub only supplies its live stars / language / links.
  */
 export function useGitHub() {
   const [data, setData] = useState<GitHubSnapshot>(githubSnapshot);
@@ -53,6 +83,18 @@ export function useGitHub() {
     };
   }, []);
 
-  const featured = data.repos.filter(r => !HIDE_FEATURED.has(r.name) && (r.description || r.homepage)).slice(0, 6);
+  const featured: FeaturedRepo[] = FEATURED.map(f => {
+    const r = data.repos.find(x => x.name.toLowerCase() === f.repo.toLowerCase());
+    return {
+      name: f.repo,
+      title: f.title,
+      description: f.blurb,
+      language: r?.language ?? '',
+      stars: r?.stars ?? 0,
+      url: r?.url ?? `${data.profileUrl}/${f.repo}`,
+      homepage: f.homepage ?? r?.homepage ?? '',
+    };
+  });
+
   return { ...data, featured, live };
 }
