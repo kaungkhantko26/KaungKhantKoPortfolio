@@ -181,3 +181,15 @@
 .site-header nav button:hover::after{transform:scaleX(1)}
 
 @media(min-width:961px){.dev-stats strong{font-size:62px}.dev-stats article{min-height:140px}}
+
+/* Custom cursor — a solid dot with a lagging ring that reacts to interactive elements */
+.has-cursor,.has-cursor *{cursor:none!important}
+.cursor-layer{position:fixed;inset:0;z-index:9999;pointer-events:none}
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;border-radius:50%;background:#fff;mix-blend-mode:difference;will-change:transform}
+.cursor-dot{width:7px;height:7px;margin:-3.5px 0 0 -3.5px}
+.cursor-ring{width:34px;height:34px;margin:-17px 0 0 -17px;background:transparent;border:2px solid #fff;transition:width .28s var(--ease),height .28s var(--ease),margin .28s var(--ease),background-color .28s var(--ease),opacity .2s}
+.cursor-layer[data-state="hidden"] .cursor-dot,.cursor-layer[data-state="hidden"] .cursor-ring{opacity:0}
+.cursor-layer[data-state="hover"] .cursor-ring{width:58px;height:58px;margin:-29px 0 0 -29px;background:rgba(255,255,255,.14)}
+.cursor-layer[data-state="hover"] .cursor-dot{opacity:0}
+.cursor-layer[data-state="down"] .cursor-ring{width:24px;height:24px;margin:-12px 0 0 -12px;background:rgba(255,255,255,.2)}
+@media(prefers-reduced-motion:reduce){.cursor-ring{transition:opacity .2s}}
