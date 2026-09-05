@@ -181,3 +181,22 @@
 .site-header nav button:hover::after{transform:scaleX(1)}
 
 @media(min-width:961px){.dev-stats strong{font-size:62px}.dev-stats article{min-height:140px}}
+
+/* Brand mark */
+.site-header .brand{gap:10px}
+.brand-mark{border-radius:7px;flex:none}
+
+/* Visual polish pass: ambient glow, grain texture, hover lift, accent highlights, active nav */
+body::before{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.035;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.route-hero,.case-hero{position:relative;overflow:hidden}
+.route-hero:before,.case-hero:before{content:"";position:absolute;width:52vw;height:52vw;max-width:760px;max-height:760px;border-radius:50%;background:radial-gradient(circle,var(--glow,var(--gold)) 0%,transparent 68%);opacity:.22;filter:blur(100px);pointer-events:none;z-index:0;top:-18%;right:-12%}
+.route-hero-inner{position:relative;z-index:1}
+.design-hero{--glow:var(--yellow)}
+.museum-hero{--glow:var(--gold)}
+.case-hero:before{top:-25%;left:-15%;right:auto}
+.case-hero>div,.case-hero>img,.case-hero>aside{position:relative;z-index:1}
+.landing h1 em,.route-hero .hero-copy h1 em{font-style:normal;color:var(--gold)}
+.stat-grid article,.dev-stats article,.developer-profile-grid article,.persona-grid article,.system-flow article,.research-grid article,.problem-grid article{transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.stat-grid article:hover,.dev-stats article:hover,.developer-profile-grid article:hover,.persona-grid article:hover,.system-flow article:hover,.research-grid article:hover,.problem-grid article:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,.18)}
+.site-header nav button.active{color:var(--gold)}
+.site-header nav button.active::after{transform:scaleX(1)}
