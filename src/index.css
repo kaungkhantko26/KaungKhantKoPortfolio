@@ -212,3 +212,13 @@ body::before{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opa
 .stat-grid article:hover,.dev-stats article:hover,.developer-profile-grid article:hover,.persona-grid article:hover,.system-flow article:hover,.research-grid article:hover,.problem-grid article:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,.18)}
 .site-header nav button.active{color:var(--gold)}
 .site-header nav button.active::after{transform:scaleX(1)}
+
+/* Landing intro — petal wipe */
+.intro-wipe{position:fixed;inset:0;z-index:900;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.intro-panel{width:100%;height:100%}
+.intro-panel.tl{background:var(--blue)}
+.intro-panel.tr{background:var(--yellow)}
+.intro-panel.bl{background:var(--cream)}
+.intro-panel.br{background:var(--sage)}
+.intro-logo{position:fixed;inset:0;z-index:901;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.intro-logo img{border-radius:22%;box-shadow:0 20px 50px rgba(0,0,0,.25)}

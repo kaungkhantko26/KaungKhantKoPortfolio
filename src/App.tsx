@@ -79,8 +79,43 @@ function Footer({ label = 'PORTFOLIO / 2026' }: { label?: string }) {
   return <footer className="connect"><div className="footer-intro"><h2>CONNECT WITH ME</h2><p>Available for design, development, and collaborative product work.</p></div><div className="contact-links"><a href={profile.linkedin} target="_blank" rel="noreferrer"><Linkedin /> LINKEDIN</a><a href={profile.github} target="_blank" rel="noreferrer"><Github /> GITHUB</a><a href={profile.website} target="_blank" rel="noreferrer"><ExternalLink /> WEBSITE</a><a href={`mailto:${profile.email}`}><Mail /> EMAIL</a></div><div className="footer-signoff"><strong>{label}</strong><small>KAUNG KHANT KO / 2026</small></div></footer>;
 }
 
+const introPanels = [
+  { key: 'tl', exit: { x: '-100%', y: '-100%' } },
+  { key: 'tr', exit: { x: '100%', y: '-100%' } },
+  { key: 'bl', exit: { x: '-100%', y: '100%' } },
+  { key: 'br', exit: { x: '100%', y: '100%' } },
+] as const;
+
+const shouldShowIntro = (() => {
+  if (sessionStorage.getItem('intro-shown') || matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  sessionStorage.setItem('intro-shown', '1');
+  return true;
+})();
+
+function IntroWipe() {
+  const [show, setShow] = useState(shouldShowIntro);
+  const [phase, setPhase] = useState<'hold' | 'exit'>('hold');
+  useEffect(() => {
+    if (!show) return;
+    const toExit = setTimeout(() => setPhase('exit'), 550);
+    const toHide = setTimeout(() => setShow(false), 1580);
+    return () => { clearTimeout(toExit); clearTimeout(toHide); };
+  }, [show]);
+  useEffect(() => {
+    if (!show) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [show]);
+  if (!show) return null;
+  return <div className="intro-wipe" aria-hidden="true">
+    {introPanels.map((p, i) => <motion.div key={p.key} className={`intro-panel ${p.key}`} animate={phase === 'exit' ? p.exit : { x: 0, y: 0 }} transition={{ duration: .75, delay: i * .07, ease: EASE }} />)}
+    <motion.div className="intro-logo" initial={{ opacity: 0, scale: .7 }} animate={phase === 'exit' ? { opacity: 0, scale: .8 } : { opacity: 1, scale: 1 }} transition={{ duration: .4, ease: EASE }}><img src="/logo.png" alt="" width={72} height={72} /></motion.div>
+  </div>;
+}
+
 function Landing() {
-  return <div className="landing page"><SiteHeader light /><div className="dot-grid" />
+  return <div className="landing page"><IntroWipe /><SiteHeader light /><div className="dot-grid" />
     <main className="landing-main">
       <motion.div className="landing-copy" variants={stagger} initial="hidden" animate="show"><motion.span variants={fadeUp} className="availability">OPEN TO WEB + DESIGN ROLES</motion.span><motion.p variants={fadeUp} className="kicker">CS STUDENT · JUNIOR GRAPHIC DESIGNER · YANGON</motion.p><motion.h1 variants={fadeUp}>IDEAS, DESIGNED<br />&amp; <em>DEVELOPED.</em></motion.h1><motion.p variants={fadeUp} className="lead">I combine visual design and programming to create practical digital products—branding, UI/UX, full-stack web apps, and cybersecurity tools.</motion.p></motion.div>
       <motion.div className="constellation" initial={{ scale: .9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: .8, delay: .2, ease: [0.22, 1, 0.36, 1] }}><motion.span animate={{ y: [0, -8, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }} whileHover={{ y: -6 }} className="design">DESIGN</motion.span><motion.span animate={{ y: [0, -10, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: .4 }} whileHover={{ y: -6 }} className="code">CODE</motion.span><motion.span animate={{ y: [0, -7, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: .8 }} whileHover={{ y: -6 }} className="research">RESEARCH</motion.span><motion.span animate={{ y: [0, -9, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }} whileHover={{ scale: 1.08 }} className="ship">SHIP</motion.span></motion.div>
