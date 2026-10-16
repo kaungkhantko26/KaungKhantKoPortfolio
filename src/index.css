@@ -182,6 +182,18 @@
 
 @media(min-width:961px){.dev-stats strong{font-size:62px}.dev-stats article{min-height:140px}}
 
+/* Custom cursor — a solid dot with a lagging ring that reacts to interactive elements */
+.has-cursor,.has-cursor *{cursor:none!important}
+.cursor-layer{position:fixed;inset:0;z-index:9999;pointer-events:none}
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;border-radius:50%;background:#fff;mix-blend-mode:difference;will-change:transform}
+.cursor-dot{width:7px;height:7px;margin:-3.5px 0 0 -3.5px}
+.cursor-ring{width:34px;height:34px;margin:-17px 0 0 -17px;background:transparent;border:2px solid #fff;transition:width .28s var(--ease),height .28s var(--ease),margin .28s var(--ease),background-color .28s var(--ease),opacity .2s}
+.cursor-layer[data-state="hidden"] .cursor-dot,.cursor-layer[data-state="hidden"] .cursor-ring{opacity:0}
+.cursor-layer[data-state="hover"] .cursor-ring{width:58px;height:58px;margin:-29px 0 0 -29px;background:rgba(255,255,255,.14)}
+.cursor-layer[data-state="hover"] .cursor-dot{opacity:0}
+.cursor-layer[data-state="down"] .cursor-ring{width:24px;height:24px;margin:-12px 0 0 -12px;background:rgba(255,255,255,.2)}
+@media(prefers-reduced-motion:reduce){.cursor-ring{transition:opacity .2s}}
+
 /* Brand mark */
 .site-header .brand{gap:10px}
 .brand-mark{border-radius:7px;flex:none}
@@ -204,7 +216,7 @@ body::before{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opa
 /* Circular scroll-progress / back-to-top button */
 .scroll-ring{position:fixed;z-index:410;right:24px;bottom:24px;width:56px;height:56px;border:0;border-radius:50%;background:none;padding:0;color:var(--cream);display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .25s var(--ease)}
 .scroll-ring:hover{transform:translateY(-2px)}
-.scroll-ring .ring-bg{position:absolute;inset:0;border-radius:50%;background:#203f35;z-index:0}
+.scroll-ring .ring-bg{position:absolute;inset:0;border-radius:50%;background:var(--dark);z-index:0}
 .scroll-ring > svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);pointer-events:none;z-index:1}
 .scroll-ring .track{fill:none;stroke:rgba(247,243,236,.18);stroke-width:2.5}
 .scroll-ring .fill{fill:none;stroke:var(--gold);stroke-width:2.5;stroke-linecap:round}
@@ -218,3 +230,13 @@ body::before{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opa
 .lanyard-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--aqua);font-size:14px}
 .lanyard-caption{display:flex;justify-content:space-between;gap:16px;margin-top:20px;font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--aqua);flex-wrap:wrap}
 @media(max-width:640px){.lanyard-caption{flex-direction:column;gap:8px}}
+
+/* Landing intro — petal wipe */
+.intro-wipe{position:fixed;inset:0;z-index:900;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.intro-panel{width:100%;height:100%}
+.intro-panel.tl{background:var(--blue)}
+.intro-panel.tr{background:var(--yellow)}
+.intro-panel.bl{background:var(--cream)}
+.intro-panel.br{background:var(--sage)}
+.intro-logo{position:fixed;inset:0;z-index:901;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.intro-logo img{border-radius:22%;box-shadow:0 20px 50px rgba(0,0,0,.25)}
