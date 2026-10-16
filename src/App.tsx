@@ -1,10 +1,19 @@
 import { AnimatePresence, MotionConfig, animate, motion, useInView, useScroll, useSpring } from 'framer-motion';
-import { ArrowLeft, ArrowRight, ExternalLink, Github, Linkedin, Mail, Menu, Star, X } from 'lucide-react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ExternalLink, Github, Linkedin, Mail, Menu, Star, X } from 'lucide-react';
+import { Suspense, lazy, useEffect, useRef, useState, type ReactNode } from 'react';
 import { certifications, profile } from './data/profile';
 // suYetPieces is generated from the linked Figma file by scripts/sync-su-yet.mjs.
 import { suYetPieces } from './data/suYet';
 import { useGitHub } from './lib/github';
+
+const Lanyard = lazy(() => import('./three/Lanyard'));
+
+const credentialBadges = [
+  { variant: 'hackerrank' as const, holderName: profile.name, cardLabel: 'HackerRank Orchestrate · October 2026', accent: '#39d353' },
+  { variant: 'cursor' as const, holderName: profile.name, cardLabel: 'Cursor AI Hackathon Myanmar · Builder', accent: '#f8c900' },
+  { variant: 'hackathon' as const, holderName: profile.name, cardLabel: "Shy's Space Hackathon · Team NexSpace", accent: '#d6336c', hackathon: { event: "Shy's Space Hackathon", team: 'NexSpace', accent: '#d6336c' } },
+  { variant: 'hackathon' as const, holderName: profile.name, cardLabel: "Let's Tech Club Hackathon · Team Swal Mal", accent: '#9b5de5', hackathon: { event: "Let's Tech Club Hackathon", team: 'Swal Mal', accent: '#9b5de5' } },
+];
 
 const EASE = [0.22, 1, 0.36, 1] as [number, number, number, number];
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.09 } } };
@@ -85,8 +94,21 @@ function Landing() {
       <motion.div className="landing-copy" variants={stagger} initial="hidden" animate="show"><motion.span variants={fadeUp} className="availability">OPEN TO WEB + DESIGN ROLES</motion.span><motion.p variants={fadeUp} className="kicker">CS STUDENT · JUNIOR GRAPHIC DESIGNER · YANGON</motion.p><motion.h1 variants={fadeUp}>IDEAS, DESIGNED<br />&amp; <em>DEVELOPED.</em></motion.h1><motion.p variants={fadeUp} className="lead">I combine visual design and programming to create practical digital products—branding, UI/UX, full-stack web apps, and cybersecurity tools.</motion.p></motion.div>
       <motion.div className="constellation" initial={{ scale: .9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: .8, delay: .2, ease: [0.22, 1, 0.36, 1] }}><motion.span animate={{ y: [0, -8, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }} whileHover={{ y: -6 }} className="design">DESIGN</motion.span><motion.span animate={{ y: [0, -10, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: .4 }} whileHover={{ y: -6 }} className="code">CODE</motion.span><motion.span animate={{ y: [0, -7, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: .8 }} whileHover={{ y: -6 }} className="research">RESEARCH</motion.span><motion.span animate={{ y: [0, -9, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }} whileHover={{ scale: 1.08 }} className="ship">SHIP</motion.span></motion.div>
       <motion.div className="route-picker" variants={stagger} initial="hidden" whileInView="show" viewport={inViewOnce}><RouteCard number="01" title="GRAPHIC DESIGN" subtitle="Brand identity · UI/UX · Artwork" path="/design" tone="blue" /><RouteCard number="02" title="COMPUTER SCIENCE" subtitle="Web apps · AI · Open source" path="/developer" tone="dark" /></motion.div>
-    </main><Footer label="SELECT A ROUTE ABOVE" />
+    </main>
+    <CredentialsLanyard />
+    <Footer label="SELECT A ROUTE ABOVE" />
   </div>;
+}
+
+function CredentialsLanyard() {
+  return <section className="section credentials"><Reveal><SectionTitle index="—" eyebrow="EVENT CREDENTIALS" title="EARNED ON THE FLOOR, NOT IN THEORY." copy="Two real badges from two real events — drag a card to feel it swing." /></Reveal>
+    <div className="lanyard-stage">
+      <Suspense fallback={<div className="lanyard-fallback" />}>
+        <Lanyard badges={credentialBadges} />
+      </Suspense>
+    </div>
+    <div className="lanyard-caption"><span>HACKERRANK ORCHESTRATE · OCT 2026</span><span>CURSOR AI HACKATHON MYANMAR · BUILDER</span><span>SHY'S SPACE HACKATHON · NEXSPACE</span><span>LET'S TECH CLUB HACKATHON · SWAL MAL</span></div>
+  </section>;
 }
 
 function RouteCard({ number, title, subtitle, path, tone }: { number: string; title: string; subtitle: string; path: RoutePath; tone: string }) {
@@ -222,13 +244,42 @@ function SuYetDesigns() {
   </div>;
 }
 
+function ScrollRing() {
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: .001 });
+  const [atTop, setAtTop] = useState(true);
+  const circumference = 2 * Math.PI * 21;
+  useEffect(() => scrollYProgress.on('change', v => setAtTop(v < 0.03)), [scrollYProgress]);
+  const onClick = () => {
+    if (atTop) {
+      window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+  return <motion.button
+    className="scroll-ring"
+    aria-label={atTop ? 'Scroll down' : 'Back to top'}
+    onClick={onClick}
+    initial={{ opacity: 0, scale: .6 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: .3, ease: [0.22, 1, 0.36, 1] }}
+  >
+    <span className="ring-bg" />
+    <svg viewBox="0 0 48 48"><circle className="track" cx="24" cy="24" r="21" /><motion.circle className="fill" cx="24" cy="24" r="21" style={{ pathLength: progress }} strokeDasharray={circumference} /></svg>
+    <motion.span className="ring-icon" key={atTop ? 'down' : 'up'} initial={{ opacity: 0, y: atTop ? -6 : 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .22 }}>
+      {atTop ? <ArrowDown /> : <ArrowUp />}
+    </motion.span>
+  </motion.button>;
+}
+
 function App() {
   const [path, setPath] = useState<RoutePath>(currentRoute);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: .001 });
   useEffect(() => { const update = () => setPath(currentRoute()); addEventListener('popstate', update); return () => removeEventListener('popstate', update); }, []);
   const page = path === '/design' ? <DesignRoute /> : path === '/design/su-yet-designs' ? <SuYetDesigns /> : path === '/developer' ? <DeveloperRoute /> : path === '/case-study/austonian-hub' ? <CaseStudy /> : path === '/case-study/cursor-ai-hackathon' ? <HackathonCaseStudy /> : <Landing />;
-  return <MotionConfig reducedMotion="user"><a className="skip-link" href="#main">Skip to content</a><motion.div className="scroll-progress" style={{ scaleX }} /><AnimatePresence mode="wait"><motion.main id="main" key={path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: .32, ease: [0.22, 1, 0.36, 1] }}>{page}</motion.main></AnimatePresence></MotionConfig>;
+  return <MotionConfig reducedMotion="user"><a className="skip-link" href="#main">Skip to content</a><motion.div className="scroll-progress" style={{ scaleX }} /><ScrollRing /><AnimatePresence mode="wait"><motion.main id="main" key={path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: .32, ease: [0.22, 1, 0.36, 1] }}>{page}</motion.main></AnimatePresence></MotionConfig>;
 }
 
 export default App;
